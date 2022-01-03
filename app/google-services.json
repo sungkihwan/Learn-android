@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "756449225482",
+    "project_id": "inbyulgram-72daa",
+    "storage_bucket": "inbyulgram-72daa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756449225482:android:3350fa7e1770d300c468f3",
+        "android_client_info": {
+          "package_name": "com.kotlin.android.inbyulgram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756449225482-c55bm6juu0qdss58hd1rj4sml8p7kj53.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kotlin.android.inbyulgram",
+            "certificate_hash": "4457f3c1238e8e4c34d340eca23ba27e8dcd244a"
+          }
+        },
+        {
+          "client_id": "756449225482-4slaniae0k1kobtab4mp4jar7ocfbsgv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwoxew6OfW2_fTlgHboc_lIideGIvoUBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756449225482-4slaniae0k1kobtab4mp4jar7ocfbsgv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
