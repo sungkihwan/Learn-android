@@ -8,6 +8,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.kotlin.android.inbyulgram.databinding.ItemHomeFeedBinding
 
 class FeedAdapter (private val context: MainActivity, private val dataList: ArrayList<Feed>) :
@@ -15,7 +18,7 @@ class FeedAdapter (private val context: MainActivity, private val dataList: Arra
 
         class ViewHolder(private val binding: ItemHomeFeedBinding) :
             RecyclerView.ViewHolder(binding.root) {
-                fun bind(context: Context, item: Feed) {
+                fun bind(context: Context, item: Feed, position: Int) {
                     binding.feedTvUserId.text = item.userId
                     var likeCount = StringBuilder()
                     likeCount
@@ -30,6 +33,10 @@ class FeedAdapter (private val context: MainActivity, private val dataList: Arra
                     binding.feedIvProfile.background = ShapeDrawable(OvalShape())
                     binding.feedIvProfile.clipToOutline = true
 
+                    var database: DatabaseReference
+                    val db = Firebase.database
+                    database = db.getReference("FeedList")
+
 // 좋아요 버튼 누르면 아래 실행
                     binding.feedBtnHeart.setOnClickListener {
 // 좋아요 버튼 on 인경우 -> 이미지 off, Like 상태 변경
@@ -37,11 +44,13 @@ class FeedAdapter (private val context: MainActivity, private val dataList: Arra
                             binding.feedBtnHeart.setImageResource(R.drawable.ic_heart_off)
                             item.isLike = false
                             item.likeCount = item.likeCount - 1
+                            database.child((position + 1).toString()).child("likeCount").setValue(item.likeCount)
                         } else {
 // 좋아요 버튼 off일때 -> 이미지 on, Like 상태변경
                             binding.feedBtnHeart.setImageResource(R.drawable.ic_heart_on)
                             item.isLike = true
                             item.likeCount = item.likeCount + 1
+                            database.child((position + 1).toString()).child("likeCount").setValue(item.likeCount)
                         }
 // 화면에 표시된 likeCount 다시 변경
                         likeCount = StringBuilder()
@@ -81,7 +90,7 @@ class FeedAdapter (private val context: MainActivity, private val dataList: Arra
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(context, dataList[position])
+        holder.bind(context, dataList[position], position)
     }
 
     override fun getItemCount(): Int {

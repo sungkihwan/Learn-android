@@ -11,7 +11,16 @@ import android.provider.MediaStore
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import com.kotlin.android.inbyulgram.databinding.ActivityUploadBinding
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class UploadActivity : AppCompatActivity() {
 
@@ -19,7 +28,9 @@ class UploadActivity : AppCompatActivity() {
     private val PICK_STORAGE = 1001
     private val PICK_CAMERA = 1000
     private var PERMISSIONS_REQUEST = 100
-    private var imageUrl: String = ""
+    private var imageUrl: Uri? = null
+    private var firebaseStorage: FirebaseStorage? = null
+    private lateinit var database: DatabaseReference
 
     private val Permissions = arrayOf(
         Manifest.permission.CAMERA,
@@ -32,6 +43,11 @@ class UploadActivity : AppCompatActivity() {
 
         binding = ActivityUploadBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+//      db 객체 셋업
+        firebaseStorage = Firebase.storage
+        val db = Firebase.database
+        database = db.getReference("FeedList")
 
         pickImage()
         checkPermissions(Permissions)
@@ -48,8 +64,8 @@ class UploadActivity : AppCompatActivity() {
         }
 
         binding.uploadBtnComplete.setOnClickListener {
-            finish()
 //          Firebase Storage 이미지 업로드
+            uploadImage()
         }
     }
 
@@ -57,7 +73,42 @@ class UploadActivity : AppCompatActivity() {
         var intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/* video/*"
 
+//      사진/영상 업로드 디프리케이티드 되서 변경해야함
         startActivityForResult(intent, PICK_STORAGE)
+    }
+
+    private fun uploadImage() {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageFileName = "$timeStamp.jpeg"
+        val storageReference = firebaseStorage?.reference?.child(imageFileName)
+        storageReference?.putFile(imageUrl!!)?.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
+            }
+            storageReference.downloadUrl
+        }?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val downloadUri = task.result
+                database.get().addOnSuccessListener {  it ->
+                    var values = it.value as ArrayList<HashMap<String,Any>>?
+                    database.child((values?.size?:0 + 1).toString()).setValue(
+                        Feed(
+                            "KihwanSung",
+                            downloadUri.toString(),
+                            downloadUri.toString(),
+                            0,
+                            false,
+                            false
+                        ))
+                }
+                finish()
+            } else {
+                // Handle failures
+                // ...
+            }
+        }
     }
 
     private fun checkPermissions(permissions: Array<String>): Boolean {
@@ -84,7 +135,7 @@ class UploadActivity : AppCompatActivity() {
             if(requestCode == PICK_STORAGE) {
                 val pickedImage: Uri? = data?.data
                 if (pickedImage != null) {
-                    imageUrl = pickedImage.toString()
+                    imageUrl = pickedImage
                 }
                 // 이미지 뿌려주기
                 Glide.with(this).load(imageUrl).into(binding.uploadIvImage)
@@ -93,7 +144,7 @@ class UploadActivity : AppCompatActivity() {
                 val imageBitmap = data?.extras?.get("data") as Bitmap
                 val pickedImage: Uri? = data?.data
                 if (pickedImage != null) {
-                    imageUrl = pickedImage.toString()
+                    imageUrl = pickedImage
                 }
                 binding.uploadIvImage.setImageBitmap(imageBitmap)
             }
