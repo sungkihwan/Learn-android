@@ -6,5 +6,5 @@ with kotlin
 
 추천시스템에 대한 비즈니스 로직 부재, 실제 Feed 처럼 캐시서버 구현 부재.
 
-다음번에 하는 android 프로젝트는 springboot나 nodejs로 서버 구축을 해야겠다
+다음번에 하는 android 프로젝트는 java나 nodejs로 서버 구축을 해야겠다
 
